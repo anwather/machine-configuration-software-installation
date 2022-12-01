@@ -15,13 +15,13 @@ SoftwareInstallation
 
 $package = New-GuestConfigurationPackage -Configuration .\SoftwareInstallation\localhost.mof -Name SoftwareInstallation -Type AuditAndSet -Version "2.0.0" -Force
 
-$storageAccountName = "smr29110msi"
-$resourceGroupName = "software-installation"
-$containerName = "software"
+$storageAccountName = "smr29110msi" ## Update this value
+$resourceGroupName = "software-installation" ## Update this value
+$storageContainerName = "software" ## Update this value
 
 $ctx = (Get-AzStorageAccount -ResourceGroupName $resourceGroupName -Name $storageAccountName).Context
 
-$blob = Set-AzStorageBlobContent -Blob (Split-Path $package.Path -Leaf) -File $package.Path -Container $containerName -Context $ctx -Force
+$blob = Set-AzStorageBlobContent -Blob (Split-Path $package.Path -Leaf) -File $package.Path -Container $storageContainerName -Context $ctx -Force
 
 $SASUri = New-AzStorageBlobSASToken -CloudBlob $blob.ICloudBlob -Permission r -ExpiryTime (Get-Date).AddYears(1) -Context $ctx -FullUri
 
@@ -38,6 +38,6 @@ $parameters = @{
     }
 }
 
-$policy = New-GuestConfigurationPolicy @parameters
+New-GuestConfigurationPolicy @parameters
 
 New-AzPolicyDefinition -Name $parameters.PolicyId -Policy .\SoftwareInstallation_DeployIfNotExists.json
